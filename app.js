@@ -52,8 +52,26 @@ const httpRequestListener = function (request, response) {
       });
     }
   }
+  if (method === "POST") {
+    if (url === "/write") {
+      let postBody = " ";
+      request.on("data", (postData) => {
+        postBody += postData;
+      });
+      request.on("end", () => {
+        const post = JSON.parse(postBody);
+        posts.push({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          userId: post.userId,
+        });
+        response.writeHead(201, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ message: "postCreated" }));
+      });
+    }
+  }
 };
-
 server.on("request", httpRequestListener);
 
 server.listen(8000, "127.0.0.1", function () {
