@@ -24,7 +24,7 @@ const posts = [
     id: 2,
     title: "HTTP의 특성",
     content: "Request/Response와 Stateless!!",
-    userId: 1,
+    userId: 2,
   },
 ];
 
@@ -69,6 +69,34 @@ const httpRequestListener = function (request, response) {
         response.writeHead(201, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ message: "postCreated" }));
       });
+    }
+  }
+
+  if (method === "GET") {
+    if (url === "/check") {
+      let body = " ";
+
+      request.on("data", (data) => {
+        body += data;
+      });
+
+      const check = posts.map((post) => {
+        //map을 돌릴때는 받아올 데이터가 없어서 쓰면 오타가 나는 듯...(request.on("end")가)
+        for (let i = 0; i < users.length; i++) {
+          if (post.userId === users[i].id) {
+            return {
+              userId: post.userId,
+              userName: users[i].name,
+              postingId: post.id,
+              postingTitle: post.title,
+              postingContent: post.content,
+            };
+          }
+        }
+      });
+
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ data: check }));
     }
   }
 };
